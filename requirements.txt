@@ -123,7 +123,7 @@ qtconsole==4.4.3
 raven==6.10.0
 redis==3.2.1
 reportlab==3.5.6
-requests==2.18.4
+requests==2.20.0
 scikit-image==0.15.0
 scipy==1.1.0
 selenium==3.141.0
