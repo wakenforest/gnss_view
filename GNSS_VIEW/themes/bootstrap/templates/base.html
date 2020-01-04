@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}首页{% endblock %} - wakenforest 博客系统</title>
+    <meta nane="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% load static %}
+
+    {% block css %}
+        <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" media="screen"> 
+    {% endblock %}
+
+    {% block scripts %}
+        <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/echarts.min.js' %}"></script>
+    {% endblock %}
+    <style>
+        
+    </style>
+    {% block extra_head %}
+    {% endblock %}
+</head>
+<body>
+
+<div class="container-fluid">
+
+    <div style="opacity:0.9; height: 60px; margin-bottom: 0px; font-family:'幼圆','黑体',sans-serif,'Comic Sans MS';
+    background-color:#E6E6FA;">
+        <div class="row">
+            <!-- <div class="col-1"> -->
+                <img src="{% static 'images/thuee_logo.png' %}" class="img-rounded"  
+                style="opacity:0.9; height: 50px; margin-top: 5px; margin-left: 36px;">
+            <!-- </div> -->
+            <!-- <div class="col-11"> -->
+                <h1 style="margin-top: 12px; font-size:30px;  margin-left: 30px;">GNSS数据处理中心</h1>
+            <!-- </div> -->
+        </div>
+    </div>
+    
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: #e3f2fd;">
+        <a class="navbar-brand" href="#">导航</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="/">数据表 <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/datashow">数据图</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/antispf">反欺骗</a>
+            </li>
+            <!-- <li class="nav-item">
+                <a class="nav-link" href="/com">Random</a>
+            </li> -->
+            <!-- <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Dropdown link
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                <a class="dropdown-item" href="#">Action</a>
+                <a class="dropdown-item" href="#">Another action</a>
+                <a class="dropdown-item" href="#">Something else here</a>
+                </div>
+            </li> -->
+            </ul>
+        </div>
+    </nav>
+</div>
+
+
+<br>
+
+<div class="container-fluid">
+    {% block main %}
+    {% endblock %}
+</div>

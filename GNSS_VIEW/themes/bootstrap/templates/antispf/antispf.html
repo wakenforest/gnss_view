@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>dashboard</title>
+    {% extends "base.html" %}
+    {% load static %}
+
+    {% block extra_head %}
+        <script type="text/javascript" src="{% static 'js/echarts.min.js' %}"></script>
+    {% endblock %}
+    
+</head>
+<body>
+
+<div class="container-fluid">
+    {% block main %}
+    <div class="row">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body" style="text-align: center;">
+                    <div id="echarts_power" style="width: 100%;height:350px; text-align:right"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+                    <div id="echarts_cn0" style="width: 100%;height:350px; text-align:right"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+    <div class="row">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+                    <div id="echarts_sqmr" style="width: 100%;height:350px; text-align:right"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+                    <div id="echarts_sqmm" style="width: 100%;height:350px; text-align:right"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+    <div class="row">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+                    <div id="echarts_dopchk" style="width: 100%;height:350px; text-align:right"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+                    <div id="echarts_dopchk2" style="width: 100%;height:350px; text-align:right"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<script type="text/javascript">
+    // 指定图表的配置项和数据
+
+    // aquire dom
+    var myChart_power = echarts.init(document.getElementById('echarts_power'));
+    var myChart_cn0 = echarts.init(document.getElementById('echarts_cn0'));
+    var myChart_sqmr = echarts.init(document.getElementById('echarts_sqmr'));
+    var myChart_sqmm = echarts.init(document.getElementById('echarts_sqmm'));
+    
+    var option_common = {
+                title: {
+                left: 'left',
+                text: 'common',
+                },
+                grid:{
+                        x:55,
+                        y:45,
+                        x2:5,
+                        y2:20,
+                        borderWidth:1,
+                        containLabel: true
+                    },
+                tooltip: { show: true },
+    
+                toolbox: { //可视化的工具箱
+                    show: true,
+                    feature: {
+                        restore: { //重置
+                            show: true
+                        },
+                        dataZoom: { //数据缩放视图
+                            show: true
+                        },
+                        saveAsImage: {//保存图片
+                            show: true
+                        },
+                    }
+                },
+                // xAxis: {
+                //     data: []
+                // },
+                // yAxis: {},
+                // series: [{
+                // name: 'data',
+                // type: 'line',
+                // smooth: true,
+                // data: []
+                // }]
+            };
+
+    // initialization
+    var option_power = option_common; option_power.title.text = '功率监测'; 
+    myChart_power.setOption(option_power);
+    myChart_power.showLoading();
+
+    var option_cn0 = option_common; option_cn0.title.text = 'C/N0(dBHz)';
+    myChart_cn0.setOption(option_cn0);
+    myChart_cn0.showLoading();
+
+    // var option_time = option_common; option_time.title.text = '时钟(us)';
+    // myChart_time.setOption(option_time);
+    // myChart_time.showLoading();
+    
+        var getting_antispf = {
+            type: "get",
+            url: "/api/com_antispf",
+            dataType: "json",
+            success: function (data) {
+                
+                // // aquire dom
+                // var myChart_power = echarts.init(document.getElementById('echarts_power'));
+                // var myChart_cn0 = echarts.init(document.getElementById('echarts_power'));
+                // var myChart_sqmr = echarts.init(document.getElementById('echarts_power'));
+
+                var series_power=[];
+                var series_cn0=[];
+                var legend_data=[];
+                for(var i = 0;i<data.power[0].length;i++){
+                    if(data.satList[i]>0)
+                    {
+                        legend_data.push( String(data.satList[i]) );
+                        series_power.push({
+                            name: String(data.satList[i]),
+                            type: 'line',
+                            stack: data.satList[i],
+                            data: data.power[i]
+                        });
+                        series_cn0.push({
+                            name: String(data.satList[i]),
+                            type: 'line',
+                            stack: data.satList[i],
+                            data: data.cn0[i]
+                        });
+                    }
+                }
+
+                // 指定图表的配置项和数据
+                var option_power = {
+                    
+                    legend: {
+                        data: legend_data,
+                        type: 'scroll',
+                    },
+                    xAxis: {
+                        data: data.key,
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: series_power
+                };
+                myChart_power.setOption(option_power);
+                myChart_power.hideLoading();
+
+                var option_cn0 = {
+                    
+                    legend: {
+                        data: legend_data,
+                        type: 'scroll',
+                    },
+                    xAxis: {
+                        data: data.key,
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: series_cn0
+                };
+                myChart_cn0.setOption(option_cn0);
+                myChart_cn0.hideLoading();
+
+                // var option_time = {
+                //     xAxis: {
+                //         data: data.key
+                //     },
+                //     yAxis: {
+                //         scale:true,
+                //     },
+                //     series: [{
+                //     name: 'clock',
+                //     smooth: true,
+                //     data: data.time,
+                //     }]
+                // };
+                // myChart_time.setOption(option_time);
+                // myChart_time.hideLoading();
+                
+            },
+            error: function () {
+            // alert('Error: ajax 请求出错！')
+            }
+        };
+
+        
+    //关键在这里，Ajax定时访问服务端，不断获取数据 ，这里是1秒请求一次。
+    window.setInterval(function(){$.ajax(getting_antispf)},1020 * 1);
+
+</script>
+
+
+{% endblock %}
+</div>
+
+</body>

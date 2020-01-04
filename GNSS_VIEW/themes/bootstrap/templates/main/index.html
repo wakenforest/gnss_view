@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>index</title>
+    {% extends "base.html" %}
+    {% load static %}
+
+</head>
+<body>
+
+<div class="container-fluid">
+    {% block main %}
+    <div class="container-fluid">
+
+        <!-- <p id="demo">我的第一个段落</p> -->
+
+        <script>
+        // 指定图表的配置项和数据
+        var getting = {
+                type: "get",
+                url: "/api/com_data",
+                dataType: "json",
+                // data: "{ \"hotelSeq\" 
+                //     + "\",\"orderNo\":\"" + orderNo
+                //     + "\",\"sortFiled\":\"" + sortFiled
+                //     + "\",\"checkDate\":\"" + checkDate
+                //     + "\"}",
+                success: function (data) {
+        
+                    var tbody_res = window.document.getElementById("tbody-result");
+                    var tbody_pos = window.document.getElementById("tbody-pos");
+
+                    // 指定图表的配置项和数据
+                    var option = {
+                        xAxis: {
+                            data: data.key
+                        },
+                        yAxis: {
+                            scale:true,
+                        },
+                        series: [{
+                        name: '数量',
+                        smooth: true,
+                        data: data.value
+                        }]
+                    };
+
+                    var str = "";
+                    len = Object.keys(data).length - 1
+                    for (var i=0; i<len; i++) {
+                    // for (i in data) {
+                        arr = data[i]
+                        str += "<tr>" +
+                            "<td align='center'>" + arr[0] + "</td>" +
+                            "<td align='center'>" + arr[1] + "</td>" +
+                            "<td align='center'>" + arr[2] + "</td>" +
+                            "<td align='center'>" + arr[3] + "</td>" +
+                            "<td align='center'>" + arr[4] + "</td>" +
+                            "<td align='center'>" + arr[5] + "</td>" +
+                            "<td align='center'>" + arr[6] + "</td>" +
+                            "<td align='center'>" + arr[7] + "</td>" +
+                            "<td align='center'>" + arr[8] + "</td>" +
+                            "<td align='center'>" + arr[9] + "</td>" +
+                            "<td align='center'>" + arr[10] + "</td>" +
+                            "<td align='center'>" + arr[11] + "</td>" +
+                            "</tr>";
+                    }
+                    tbody_res.innerHTML = str;
+
+
+                    arr = data[len]
+                    str = "";
+                    str += "<tr>" +
+                        "<td align='center'>" + arr[0] + "</td>" +
+                        "<td align='center'>" + arr[1] + "</td>" +
+                        "<td align='center'>" + arr[2] + "</td>" +
+                        "<td align='center'>" + arr[3] + "</td>" +
+                        "<td align='center'>" + arr[4] + "</td>" +
+                        "<td align='center'>" + arr[5] + "</td>" +
+                        "</tr>";
+                    tbody_pos.innerHTML = str;
+            
+                    // console.log(data);
+                    // document.getElementById("demo").innerHTML = Object.keys(data).length;
+
+                },
+                error: function () {
+                // alert('Error: ajax 请求出错！')
+                }
+            };
+        
+        //关键在这里，Ajax定时访问服务端，不断获取数据 ，这里是1秒请求一次。
+        window.setInterval(function(){$.ajax(getting)},1020 * 1);
+        
+        
+        </script>
+
+        <h5 style="text-align: left;">监测接收机测量信息</h5>           
+        <table class="table table-striped table-sm table-bordered" style="text-align:center;">
+            <thead>
+            <tr>
+                <th>通道号</th>
+                <th>卫星号</th>
+                <th>捕获结果</th>
+                <th>信号功率</th>
+                <th>载噪比</th>
+                <th>SQM R</th>
+                <th>SQM M</th>
+                <th>多普勒一致</th>
+                <th>方位角</th>
+                <th>俯仰角</th>
+                <th>发射时间</th>
+                <th>定位</th>
+            </tr>
+            </thead>
+            <tbody id="tbody-result">
+                <tr>
+                    <td>0</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+                <tr>
+                    <td>1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+                <tr>
+                    <td>2</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+                <tr>
+                    <td>3</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+            </tbody>
+        </table>
+
+
+        <h5 style="text-align: left;">监测接收机定位信息</h5>           
+        <table class="table table-striped table-sm table-bordered" style="text-align:center; width:700px;">
+            <thead>
+            <tr>
+                <th>纬度</th>
+                <th>经度</th>
+                <th>高程</th>
+                <th>钟差</th>
+                <th>SSE</th>
+                <th>PDOP</th>
+            </tr>
+            </thead>
+            <tbody id="tbody-pos">
+                <tr>
+                    <td>0</td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    
+    
+    {% endblock %}
+
+</div>
+</body>
+</html>

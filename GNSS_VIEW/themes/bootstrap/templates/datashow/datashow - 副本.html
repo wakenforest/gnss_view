@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>dashboard</title>
+    {% extends "base.html" %}
+    {% load static %}
+
+    {% block extra_head %}
+        <script type="text/javascript" src="{% static 'js/canvas_autosize.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/my_queue.js' %}"></script>
+        <script type="text/javascript">
+            function MyQueue() {
+                    
+                //初始化队列（使用数组实现）
+                var items = [];
+            
+                //向队列（尾部）中插入元素
+                this.enqueue = function(element) {
+                    items.push(element);
+                }
+            
+                //从队列（头部）中弹出一个元素，并返回该元素
+                this.dequeue = function() {
+                    return items.shift();
+                }
+            
+                //查看队列最前面的元素（数组中索引为0的元素）
+                this.front = function() {
+                    return items[0];
+                }
+            
+                //查看队列是否为空，如果为空，返回true；否则返回false
+                this.isEmpty = function() {
+                    return items.length == 0;
+                }
+            
+                //查看队列的长度
+                this.size = function() {
+                    return items.length;
+                }
+            
+                //查看队列
+                this.print = function() {
+                    //以字符串形势返回
+                    return items.toString();
+                }
+
+                    //返回所有元素（数组）
+    this.iter = function() {
+        //以字符串形势返回
+        return items;
+    }
+            }
+            </script>
+    {% endblock %}
+    
+</head>
+<body>
+
+<div class="container-fluid">
+    {% block main %}
+    <div class="row">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body" style="text-align: center;">
+
+                    <div class="row">
+                        <div class="col-sm-7" >  
+                            <canvas id="skyPic" width="390" height="390" ></canvas>
+                        </div>
+
+                        <div class="col-sm-5 table-responsive d-none d-lg-block">
+                            <table class="table table-striped table-sm" 
+                            style="text-align:center; width:280px; font-size: 12px; vertical-align: middle;">
+                                <thead>
+                                <tr>
+                                    <th>卫星号</th>
+                                    <th>方位角</th>
+                                    <th>俯仰角</th>
+                                </tr>
+                                </thead>
+                                <tbody id="tbody-elaz">
+                                    <tr>
+                                        <td>0</td><td></td><td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+                    <div id="main" style="width: 100%;height:400px; text-align:right"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+    <div class="col-6">
+        <div class="card">
+            <div class="card-body">
+                <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+                <div id="echarts_pos_height" style="width: 100%;height:400px; text-align:right"></div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script type="text/javascript">
+
+        // function myrefresh() {
+        //   window.location.reload();
+        // }
+        // setTimeout('myrefresh()', 1000); 
+    
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+    
+        myChart.setOption({
+                title: {
+                left: 'center',
+                text: '随机数据显示',
+                },
+                grid:{
+                        x:55,
+                        y:45,
+                        x2:5,
+                        y2:20,
+                        borderWidth:1
+                    },
+                tooltip: { show: true },
+    
+                toolbox: { //可视化的工具箱
+                    show: true,
+                    feature: {
+                        dataView: { //数据视图
+                            show: true
+                        },
+                        restore: { //重置
+                            show: true
+                        },
+                        dataZoom: { //数据缩放视图
+                            show: true
+                        },
+                        saveAsImage: {//保存图片
+                            show: true
+                        },
+                        magicType: {//动态类型切换
+                            type: ['bar', 'line']
+                        }
+                    }
+                },
+    
+                xAxis: {
+                    data: []
+                },
+                yAxis: {},
+                series: [{
+                name: '数量',
+                type: 'line',
+                smooth: true,
+                data: []
+                }]
+            });
+    
+    myChart.showLoading();
+    
+    // 指定图表的配置项和数据
+    var getting2 = {
+          type: "get",
+          url: "/api/echarts",
+          dataType: "json",
+          success: function (data) {
+    
+            // 指定图表的配置项和数据
+            var option = {
+                xAxis: {
+                    data: data.key
+                },
+                yAxis: {
+                    scale:true,
+                },
+                series: [{
+                name: '数量',
+                smooth: true,
+                data: data.value
+                }]
+            };
+    
+            //console.log(data.value);
+    
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+            myChart.hideLoading();
+          },
+          error: function () {
+            alert('Error: ajax 请求出错！')
+          }
+        };
+    
+    //关键在这里，Ajax定时访问服务端，不断获取数据 ，这里是1秒请求一次。
+    window.setInterval(function(){$.ajax(getting2)},1020 * 1);
+    </script>
+
+<script>
+    // 指定图表的配置项和数据
+
+    // aquire dom
+    var myChart_height = echarts.init(document.getElementById('echarts_pos_height'));
+    var tbody_elaz = window.document.getElementById("tbody-elaz");
+
+    myChart_height.setOption({
+                title: {
+                left: 'center',
+                text: '随机数据显示',
+                },
+                grid:{
+                        x:55,
+                        y:45,
+                        x2:5,
+                        y2:20,
+                        borderWidth:1
+                    },
+                tooltip: { show: true },
+    
+                toolbox: { //可视化的工具箱
+                    show: true,
+                    feature: {
+                        dataView: { //数据视图
+                            show: true
+                        },
+                        restore: { //重置
+                            show: true
+                        },
+                        dataZoom: { //数据缩放视图
+                            show: true
+                        },
+                        saveAsImage: {//保存图片
+                            show: true
+                        },
+                        magicType: {//动态类型切换
+                            type: ['bar', 'line']
+                        }
+                    }
+                },
+    
+                xAxis: {
+                    data: []
+                },
+                yAxis: {},
+                series: [{
+                name: '数量',
+                type: 'line',
+                smooth: true,
+                data: []
+                }]
+            });
+    myChart.showLoading();
+
+    var queue_pos_lat = new MyQueue();
+    var queue_pos_lon = new MyQueue();
+    var queue_pos_height = new MyQueue();
+
+    var getting = {
+            type: "get",
+            url: "/api/com_data",
+            dataType: "json",
+            success: function (data) {
+    
+                
+
+                // find pos_lat and pos_lon, and push them into queue
+                len = Object.keys(data).length - 1;  // numbers of satellites
+                arr = data[len];                     // last line of received data, corresponding to position and sse
+                if(queue_pos_lat.size()<30)
+                {
+                    var lat = arr[0];
+                    var lon = arr[1];
+                    var height = arr[2];
+                    queue_pos_lat.enqueue(lat);
+                    queue_pos_lon.enqueue(lon);
+                    queue_pos_height.enqueue(height);
+                }
+                else
+                {
+                    waste = queue_pos_lat.dequeue(lat);
+                    waste = queue_pos_lon.dequeue(lon);
+                    waste = queue_pos_height.dequeue(height);
+                    queue_pos_lat.enqueue(lat);
+                    queue_pos_lon.enqueue(lon);
+                    queue_pos_height.enqueue(height);
+                }
+                var arr_height = queue_pos_height.iter();
+                console.log(arr_height);
+                console.log(queue_pos_lat.size());
+                
+                var arr_x = Object.keys(new Int8Array(30)).map(Number);
+                console.log(arr_x);
+
+                // 指定图表的配置项和数据
+                var option_height = {
+                    xAxis: {
+                        data: arr_x
+                    },
+                    yAxis: {
+                        scale:true,
+                    },
+                    series: [{
+                    name: '数量',
+                    smooth: true,
+                    data: arr_height
+                    }]
+                };
+
+                // 使用刚指定的配置项和数据显示图表。
+                myChart_height.setOption(option_height);
+                myChart_height.hideLoading();
+
+
+                // prepare for satellite el and az angles
+                var str = "";
+                drawData = [];
+                var item;
+                for (var i=0; i<len; i++) {
+                    
+                    arr = data[i]
+
+                    str += "<tr>" +
+                            "<td align='center'>" + arr[1] + "</td>" +
+                            "<td align='center'>" + arr[8] + "</td>" +
+                            "<td align='center'>" + arr[9] + "</td>" +
+                            "</tr>"
+                    if(arr[9]>0)
+                    {
+                        var sattype;
+                        if(arr[1]<6)
+                            sattype = 1;
+                        else if(arr[1]<11 || arr[1]==16)
+                            sattype = 3;
+                        else
+                            sattype = 4;
+                        item = {"type":sattype,"num":arr[1], "elevation":arr[9], "azimuth":arr[8] };
+                        drawData.push(item);
+                    }
+                }
+
+                tbody_elaz.innerHTML = str;
+
+
+                // console.log(data);
+                // document.getElementById("demo").innerHTML = Object.keys(data).length;
+            },
+            error: function () {
+            // alert('Error: ajax 请求出错！')
+            }
+        };
+    
+    //关键在这里，Ajax定时访问服务端，不断获取数据 ，这里是1秒请求一次。
+    window.setInterval(function(){$.ajax(getting)},1020 * 1);
+
+    // 绘制skyPlot
+    function drawBaseSky(cxt){
+
+        cxt.clearRect(0,0,390,390);//清空画布
+
+        var RADIUS = 180;//半径
+        
+        cxt.save();	//保存状态
+
+        cxt.translate(15,15);//坐标原点移动，留出边界值，让可能出现在最外层的信息能显示
+
+        //绘制背景
+        cxt.beginPath();
+        cxt.fillStyle = 'rgb(248,248,248)';
+        cxt.arc(RADIUS, RADIUS, RADIUS, 0, Math.PI*2, false);
+        // cxt.setLineDash([5,5]);
+        cxt.strokeStyle = 'rgb(190,190,190)';
+        cxt.stroke();
+        // cxt.fill();
+
+        cxt.beginPath();
+        cxt.fillStyle ='white';
+        cxt.arc(RADIUS, RADIUS, RADIUS*2/3, 0, Math.PI*2, false);
+        cxt.strokeStyle = 'rgb(190,190,190)';
+        cxt.setLineDash([5,5]);
+        cxt.stroke();
+        // cxt.fill();
+
+        cxt.beginPath();
+        cxt.fillStyle = 'rgb(248,248,248)';
+        cxt.arc(RADIUS, RADIUS, RADIUS/3, 0, Math.PI*2, false);
+        cxt.strokeStyle = 'rgb(190,190,190)';
+        cxt.setLineDash([5,5]);
+        cxt.stroke();
+        // cxt.fill();
+
+        cxt.save();	//保存状态
+
+        //通过旋转的方式画圆中的分割线
+        cxt.beginPath();
+        cxt.strokeStyle = 'rgb(190,190,190)';
+        cxt.translate(RADIUS,RADIUS);
+        for(var i=0;i<12;i++){
+            cxt.rotate(Math.PI/180*30);
+            cxt.setLineDash([5,5]);
+            cxt.moveTo(0,0);
+            cxt.lineTo(0,RADIUS);
+        }
+        cxt.stroke();
+
+        cxt.restore();
+        cxt.restore();
+
+    }
+    //绘制数据分布
+    function drawSkyPosition(drawData,cxt){
+        var color ={
+            "1":"rgb(75,164,259)",
+            "2":"rgb(173,152,12)", 
+            "3":"rgb(226,120,228)",
+            "4":"rgb(117,173,61)", 
+            "5":"rgb(230,139,55)", 
+            "6":"rgb(61,168,161)"
+        }; 
+        // var cxt = document.getElementById('skyPic').getContext("2d");
+        var radius = 180;//半径
+        var cosLen,x,y;
+
+        cxt.save();
+        cxt.translate(15,15);
+        cxt.translate(radius,radius);
+
+        cxt.font = "bold 14px Arial";
+        cxt.textAlign = "center";
+        cxt.textBaseline = "middle";
+
+        for(var i=0,dataLen = drawData.length;i<dataLen;i++){
+            cxt.beginPath();
+            cxt.fillStyle = color[drawData[i].type];
+
+            //关键代码。求圆心坐标。coslen是求出来的该点到圆心的距离。
+            var cosLen = Math.cos(drawData[i].elevation*Math.PI/180)*radius;
+            y = Math.cos(drawData[i].azimuth*Math.PI/180)* cosLen;
+            x = Math.sin(drawData[i].azimuth*Math.PI/180)* cosLen;
+
+            cxt.arc(x,-y , 16, 0, Math.PI*2, false);//在坐标点绘制圆
+            cxt.fill();
+
+            cxt.beginPath();
+            cxt.fillStyle ='white';
+            cxt.fillText(drawData[i].num, x-2, -y);//在坐标点写文字卫星号
+        }
+        cxt.restore();
+    }
+    function getRandom(n){
+        return Math.floor(Math.random()*n+1);
+    }
+    //elevation仰角 azimuth方位角。这里生成随机数据。
+    function createBaseDate(){
+        drawData = [];
+        var item 
+        for(var i = 0 ;i<15;i++){
+            item = {"type":getRandom(5)+1,"num":getRandom(99), "elevation":getRandom(89), "azimuth":getRandom(360) };
+            drawData.push(item);
+        }
+    }
+
+    function newSky(){
+        drawBaseSky(cxt);
+        // createBaseDate();
+        drawSkyPosition(drawData,cxt);
+    }
+
+    //定时刷新
+    var drawData = [];
+    var cxt = document.getElementById('skyPic').getContext("2d");
+    newSky()
+    setInterval(function(){
+        newSky();
+    },1020)
+</script>
+
+
+{% endblock %}
+</div>
+
+</body>

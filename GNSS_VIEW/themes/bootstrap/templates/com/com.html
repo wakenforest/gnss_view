@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>random</title>
+    {% extends "base.html" %}
+    {% load static %}
+
+</head>
+<body>
+
+{% block main %}
+
+<div class="row">
+    <div class="col-6">
+        <div class="card">
+            <div class="card-body">
+        <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+                <div id="main" style="width: 650px;height:400px;text-align:right"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="card">
+            <div class="card-body">
+        <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+                <div id="main" style="width: 650px;height:400px;text-align:right"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    // function myrefresh() {
+    //   window.location.reload();
+    // }
+    // setTimeout('myrefresh()', 1000); 
+
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main'));
+
+    myChart.setOption({
+            title: {
+            left: 'center',
+            text: '随机数据显示',
+            },
+            grid:{
+                    x:55,
+                    y:45,
+                    x2:5,
+                    y2:20,
+                    borderWidth:1
+                },
+            tooltip: { show: true },
+
+            toolbox: { //可视化的工具箱
+                show: true,
+                feature: {
+                    dataView: { //数据视图
+                        show: true
+                    },
+                    restore: { //重置
+                        show: true
+                    },
+                    dataZoom: { //数据缩放视图
+                        show: true
+                    },
+                    saveAsImage: {//保存图片
+                        show: true
+                    },
+                    magicType: {//动态类型切换
+                        type: ['bar', 'line']
+                    }
+                }
+            },
+
+            xAxis: {
+                data: []
+            },
+            yAxis: {},
+            series: [{
+            name: '数量',
+            type: 'line',
+            smooth: true,
+            data: []
+            }]
+        });
+
+myChart.showLoading();
+
+// 指定图表的配置项和数据
+var getting = {
+      type: "get",
+      url: "/api/echarts",
+      dataType: "json",
+      success: function (data) {
+
+        // 指定图表的配置项和数据
+        var option = {
+            xAxis: {
+                data: data.key
+            },
+            yAxis: {
+                scale:true,
+            },
+            series: [{
+            name: '数量',
+            smooth: true,
+            data: data.value
+            }]
+        };
+
+        console.log(data.value);
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+        myChart.hideLoading();
+      },
+      error: function () {
+        alert('Error: ajax 请求出错！')
+      }
+    };
+
+//关键在这里，Ajax定时访问服务端，不断获取数据 ，这里是1秒请求一次。
+window.setInterval(function(){$.ajax(getting)},1020 * 1);
+
+
+</script>
+
+{% endblock %}
+
+</body>
