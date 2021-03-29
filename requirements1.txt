@@ -44,7 +44,7 @@ pyecharts-javascripthon==0.0.6
 pyecharts-jupyter-installer==0.0.3
 pyecharts-snapshot==0.1.10
 pygal==2.4.0
-Pygments==2.2.0
+Pygments==2.7.4
 PyInstaller==3.4
 pylint==2.1.1
 pymongo==3.8.0
