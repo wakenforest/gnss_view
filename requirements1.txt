@@ -51,7 +51,7 @@ pymongo==3.8.0
 PyMySQL==0.9.2
 pyOpenSSL==19.0.0
 pyparsing==2.2.1
-PyPDF2==1.26.0
+PyPDF2==1.27.5
 pypiwin32==223
 PyQt5-sip==4.19.13
 pyquery==1.4.0
